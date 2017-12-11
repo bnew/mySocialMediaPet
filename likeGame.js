@@ -99,6 +99,7 @@ function likeGameSetup(){
 	        waitingString = "waiting for likes"
 	    }
 	    textAlign(CENTER);
+      textFont("Courier");
 	    text(waitingString,width/2,height/2);
 	    text(likeCount,width/2,height/2+40);
 	    generateLikes();

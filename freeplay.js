@@ -28,13 +28,10 @@ let photoIcon;
 var usernameInput;
 let daUsername = "username";
 
-let forceLandscapeFlag = false;
-
 function setup() {
   createCanvas(windowWidth, windowHeight);
   pixelDensity(2); //for now this seems the best way to get decent rendering on mobile
   likeGameSetup();
-  loadWandererCharacters()
   photoIcon = loadImage("photoButton.svg");
 
 
@@ -272,241 +269,8 @@ function setup() {
       //else if(frameCount% 120 <= 60) image(wifiBad,0,0,20,20);
     pop();
   },function(){
-    return (likes > 20 && followers > 9 && !likeGameActive && !followGameActive);
+    return false;
   }));
-
-
-
-  scenes.push(createScene( "maybe theyll figure out how to break free",function(){
-    if(!this.isActive){
-    this.frameStart = frameCount;
-    this.isActive = true;
-  }
-    drawBox(); 
-    setSpriteBounds(0,phoneInfoHeight,width,height);
-    drawFollowCount(0);
-    drawLikeCount(0);
-
-    push();
-    translate(stretchy.position.x ,stretchy.position.y-stretchy.height*10)
-      //rotate(.1*PI)
-      textReset();
-      textStyle(ITALIC)
-      if(frameCount  - this.frameStart > 1000 && !likeGameActive && !followGameActive)text("I wonder what it would be like\nto disconnect",0,0);
-      //else if(frameCount% 120 <= 60) image(wifiBad,0,0,20,20);
-    pop();
-
-    followGame();
-    likeGame();
-  },function(){
-    return !online;
-  }))
-
-
-  scenes.push(createScene("lose service", function() {
-    if(!this.isActive){
-      removeElements();
-      this.frameStart = frameCount;
-      this.isActive = true;
-    }
-    camera.zoom = .5;
-
-    rectMode(CORNER);
-    setSpriteBounds(0,phoneInfoHeight,width,height);
-    noFill();
-    stroke(205,0,0);
-    strokeWeight(boxStroke);
-    rect(0,0,width,height);
-    image(wifiBad,width-60,40,20,20);
-
-    textReset();
-    textSize(16);
-    textStyle(ITALIC);
-    if(frameCount-this.frameStart > 400) text("(rotate your phone)", width/2, -100)
-  },  function(){
-    return !online && getOrientation() == "LANDSCAPE" ; //&& orientation == "PORTRAIT"
-  }))
-
-  scenes.push(createScene("tipped phone", function() {
-
-    camera.zoom = .5;
-        setSpriteBounds(0,0,width*2,height);
-
-    noFill();
-    stroke(205,0,0);
-    strokeWeight(boxStroke);
-    rect(0,0,width,height);
-    //TODO make box look broken
-    forceLandscape();
-
-  }, function(){
-    return stretchy.position.x > width*1.5;
-  }))
-
-  scenes.push(createScene("moving ahead", function() {
-      //let sceneWidth = width*2;
-      if(!this.isActive) {
-        stretchy.position.x = -.5*width;
-        this.isActive = true;
-      }    
-      setSpriteBounds(-.5*width,-.5*height,width*2,height);
-      forceLandscape();
-  
-      noFill();
-      // stroke(205,0,0);
-      // strokeWeight(boxStroke);
-      // rect(0,0,width,height);
-    }, function(){
-      return stretchy.position.x > width*1.5;
-    }))
-  
-  scenes.push(createScene("box encounter",function(){
-      if(!this.isActive) {
-        stretchy.position.x = -.5*width;
-        this.isActive = true;
-        this.frameStart = frameCount;
-      }
-      setSpriteBounds(-.5*width,-.5*height,width,height);
-      forceLandscape();
-  
-      noFill();
-      stroke(0,205,0);
-      strokeWeight(boxStroke);
-      rect(width,-height,height,height*2);
-  }, function(){
-    //if this scene has been active for a certain amount of time...
-    return (frameCount - this.frameStart > 200);
-  }))
-  
-  scenes.push(createScene("cut scene 1", function(){
-    if(!this.isActive) {
-        this.frameStart = frameCount;
-        this.isActive = true;
-    }
-
-    setSpriteBounds(-.5*width,-.5*height,width,height);
-    forceLandscape();
-    noFill();
-    stroke(0,205,0);
-    strokeWeight(boxStroke);
-
-    rect(width,-height,height,height*2);     //setSpriteBounds(-.5*width,-.5*height,width,height);
-    push();
-    translate(stretchy.position.x+stretchy.width*4 ,stretchy.position.y-stretchy.height*4)
-    rotate(-.25*PI)
-    noStroke();
-    fill(0);
-    textSize(60);
-    if(frameCount-this.frameStart < 200) text("hey!",0,0);
-    else if(frameCount-this.frameStart < 250 ) text("...",0,0)
-      else if(frameCount-this.frameStart < 450) text("is anyone there?",0,0)
-     pop();
-  }, function(){
-    return frameCount-this.frameStart > 500;
-  }))
-  
-  scenes.push(createScene("first reveal", function(){
-    forceLandscape();
-    if(!this.isActive) {
-      this.frameStart = frameCount;
-      this.isActive = true;
-      //createBoxSprites + extra characters
-      if(getOrientation()=="LANDSCAPE"){
-      boxWidth = height;
-      boxHeight = width;
-    }else{
-      boxWidth = width;
-      boxHeight = height;
-    }
-      createSpritesForWanderingScene();
-    }
-
-    setSpriteBounds(-.5*width,-.5*height,width,height);
-    stretchy.bounce(boxes);
-    noFill();
-    stroke(205,0,0);
-    strokeWeight(boxStroke);
-    rect(-width*2,0,width,height);
-    if( camera.position.x < width*3)
-       camera.position.x += 5
-     if(camera.position.y < height*5 && camera.position.x> width*2)
-      camera.position.y +=4;
-    if(camera.zoom > .1) {camera.zoom = camera.zoom - .001
-       if(camera.zoom <= .1)this.frameStart = frameCount //hack to have it hold at zoom before switching scenes
-     }
-    //console.log(camera.position.x);
-  },function(){
-    return camera.zoom <= .1 && frameCount - this.frameStart > 400;
-  }))
-
-
-
-  scenes.push(createScene("wanderer",function(){
-    if(!this.isActive) {
-        //camera.zoom = .5;
-        //cameraReset();
-        this.frameStart = frameCount;
-        this.isActive = true;
-        gravity = false;
-        stretchy.velocity.x = 2;
-        stretchy.velocity.y = 1;
-    }
-    forceLandscape();
-    noFill();
-    stroke(205,0,0);
-    strokeWeight(boxStroke);
-    rect(-width*2,0,width,height);
-    if(camera.zoom < .5) camera.zoom += .001;
-    camera.position.x = stretchy.position.x;
-    camera.position.y = stretchy.position.y;
-    stretchy.bounce(boxes);
-    setSpriteBounds(-width*.5,-height*2,width*6,height*10);
-  },function(){
-    // return   stretchy.position.x >= width + boxWidth*5.5 && stretchy.position.y >= -boxHeight*.5 + boxHeight*4;
-    return false;
-  }))
-  /*
-  scenes.push(createScene("connection cut scene",
-    function(){
-      if(!this.isActive) {  
-        camera.position.x = width + boxWidth*6.5
-        camera.position.y = boxHeight*4.5
-        camera.zoom -= .15 ;
-        this.isActive = true;
-        this.frameStart = frameCount;
-      }
-      stretchy.bounce(boxes);
-      setSpriteBounds(-width*.5,-height*2,width*6,height*10);
-      textSize(60);
-      text("dm", camera.position.x, camera.position.y)
-  
-    }, function(){
-      return frameCount - this.frameStart > 200;
-    }))
-
-  scenes.push(createScene("end of act 1", function(){
-    if(!this.isActive){
-      deleteWandererSprites();
-      this.isActive = true;
-    }
-    background(255)
-    texReset();
-    text("end of act 1...\ntap to take care of your pet until new acts are released", width/2,height/2);
-    },function(){
-      return mouseIsPressed;
-    }))
-
-  scenes.push(createScene("freeplay", function(){
-      drawBox(); 
-      setSpriteBounds(0,phoneInfoHeight,width,height);
-      drawFollowCount(0);
-      drawLikeCount(0);
-      followGame();
-      likeGame();
-  },function(){
-    return false;
-  }))
-  */
 }
 
 function getOrientation(){
@@ -550,12 +314,6 @@ function mousePressed(){
 function draw() {
   background(255, 255, 255);
   online = navigator.onLine;
-
-  if(forceLandscapeFlag){
-    textReset();
-    text("please rotate your phone", width/2,height/2)
-    if(getOrientation() == "LANDSCAPE") forceLandscapeFlag = false;
-  }else{
     //mouse trailer, the speed is inversely proportional to the mouse distance
     if(mouseIsPressed){
       stretchy.velocity.x = (camera.mouseX-stretchy.position.x)/10;
@@ -574,7 +332,6 @@ function draw() {
         scenes[currentScene].isActive = false;
         currentScene++;
     }
-}
 
 
 
